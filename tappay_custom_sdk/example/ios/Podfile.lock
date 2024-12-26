@@ -1,0 +1,28 @@
+PODS:
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - tappay_custom_sdk (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - tappay_custom_sdk (from `.symlinks/plugins/tappay_custom_sdk/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  tappay_custom_sdk:
+    :path: ".symlinks/plugins/tappay_custom_sdk/ios"
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
+  tappay_custom_sdk: 0a39d5429b87d438719b1a719d93790806ba2397
+
+PODFILE CHECKSUM: b28fdb839dbb0609a6d54c1c50f9ea16fc39f2fd
+
+COCOAPODS: 1.16.2
