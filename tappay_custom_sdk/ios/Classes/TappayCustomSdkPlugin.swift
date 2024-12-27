@@ -16,10 +16,23 @@ public class TappayCustomSdkPlugin: NSObject, FlutterPlugin {
          let appId = args["appId"] as? Int32,
          let appKey = args["appKey"] as? String,
          let isDebug = args["isDebug"] as? Bool {
+        
+        // 設定 SDK
         TPDSetup.setWithAppId(appId, withAppKey: appKey, with: isDebug ? .sandBox : .production)
-        result(nil)
+        
+        // 檢查 SDK 狀態
+        let status = TPDStatus()
+        if !status.isHasAnyError() {
+          result(nil)
+        } else {
+          result(FlutterError(code: "SETUP_ERROR",
+                             message: "Failed to initialize TapPay SDK",
+                             details: nil))
+        }
       } else {
-        result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid arguments for setupSDK", details: nil))
+        result(FlutterError(code: "INVALID_ARGUMENTS",
+                           message: "Invalid arguments for setupSDK",
+                           details: nil))
       }
       
     case "getCardPrime":
@@ -29,53 +42,35 @@ public class TappayCustomSdkPlugin: NSObject, FlutterPlugin {
          let dueYear = args["dueYear"] as? String,
          let ccv = args["ccv"] as? String {
         
-        // 建立並設定 TPDForm
-        guard let form = TPDForm.setup(withContainer: nil) else {
-          result(FlutterError(code: "FORM_ERROR",
-                             message: "Failed to setup form",
-                             details: nil))
-          return
-        }
-        
-        // 驗證卡片資訊
-        guard let cardValidation = TPDCard.validate(withCardNumber: cardNumber,
-                                                  withDueMonth: dueMonth,
-                                                  withDueYear: dueYear,
-                                                  withCCV: ccv) else {
-          result(FlutterError(code: "VALIDATION_ERROR",
-                             message: "Failed to validate card",
-                             details: nil))
-          return
-        }
-        
-        if cardValidation.isCardNumberValid && 
-           cardValidation.isExpiryDateValid && 
-           cardValidation.isCCVValid {
+        // 確保在主線程中執行 UI 相關操作
+        DispatchQueue.main.async {
+          // 創建一個容器視圖
+          let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 50))
           
-          // 使用 TPDCard 取得 Prime
-          let card = TPDCard.setup(form)
+          // 設置 TPDForm
+          let tpdForm = TPDForm.setup(withContainer: containerView)
           
-          card.onSuccessCallback { (prime, cardInfo, cardIdentifier, merchantReferenceInfo) in
-            if let prime = prime {
-              let response = ["prime": prime]
-              result(response)
-            } else {
-              result(FlutterError(code: "PRIME_ERROR",
-                                message: "Failed to get prime",
+          // 設置卡片資訊
+          tpdForm.setCardNumber(cardNumber)
+          tpdForm.setExpiryMonth(dueMonth)
+          tpdForm.setExpiryYear(dueYear)
+          tpdForm.setCCV(ccv)
+          
+          // 獲取 prime
+          if tpdForm.isCanGetPrime() {
+            tpdForm.onSuccessCallback { prime in
+              result(["prime": prime])
+            }.onFailureCallback { status, message in
+              result(FlutterError(code: String(status),
+                                message: message,
                                 details: nil))
-            }
-          }.onFailureCallback { status, message in
-            result(FlutterError(code: String(status),
-                              message: message,
-                              details: nil))
-          }.getPrime()
-          
-        } else {
-          result(FlutterError(code: "INVALID_CARD",
-                             message: "Invalid card information",
-                             details: nil))
+            }.getPrime()
+          } else {
+            result(FlutterError(code: "INVALID_CARD",
+                               message: "Invalid card information",
+                               details: nil))
+          }
         }
-        
       } else {
         result(FlutterError(code: "INVALID_ARGUMENTS",
                            message: "Invalid arguments for getCardPrime",

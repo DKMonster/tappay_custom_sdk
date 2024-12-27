@@ -14,15 +14,18 @@ class _TestPageState extends State<TestPage> {
 
   Future<void> _setupSDK() async {
     try {
+      // for tappay official 11340 and app_whdEWBH8e8Lzy4N6BysVRRMILYORF6UxXbiOFsICkz0J9j1C0JUlCHv1tVJC
       await _tappaySDK.setupSDK(
-        appId: 12345,
-        appKey: 'xxxxx',
+        appId: 11340,
+        appKey:
+            'app_whdEWBH8e8Lzy4N6BysVRRMILYORF6UxXbiOFsICkz0J9j1C0JUlCHv1tVJC',
         isDebug: true,
       );
       setState(() {
         _result = 'Setup SDK 成功';
       });
     } catch (e) {
+      print(e);
       setState(() {
         _result = 'Setup SDK 失敗: $e';
       });
