@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GooglePayExample</string>
+    <string name="gpay_content_description">Buy with Google Pay</string>
+    <string name="confirm_payment">確認付款</string>
+</resources>
